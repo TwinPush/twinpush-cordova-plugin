@@ -1,0 +1,17 @@
+{
+  "name": "twinpush",
+  "version": "1.0.0",
+  "description": "Cordova wrapper for the native TwinPush SDK",
+  "cordova": {
+    "id": "twinpush-plugin",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "TwinCoders S.L.",
+  "license": "MIT"
+}
