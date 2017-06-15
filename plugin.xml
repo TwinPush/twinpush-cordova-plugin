@@ -1,6 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="twinpush-plugin" version="1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="twinpush-plugin" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>twinpush</name>
+
+	<preference name="APP_ID"/>
+	<preference name="API_KEY"/>
+	<preference name="SUBDOMAIN" default="app"/>
+
 	<js-module name="twinpush" src="www/twinpush.js">
 		<clobbers target="cordova.plugins.twinpush"/>
 	</js-module>
@@ -8,9 +13,17 @@
 		<config-file parent="/*" target="config.xml">
 			<feature name="twinpush">
 				<param name="ios-package" value="twinpush"/>
+				<param name="onload" value="true" />
 			</feature>
 		</config-file>
 		<source-file src="src/ios/twinpush.m"/>
 		<framework src="TwinPushSDK" type="podspec" spec="2.2.0"/>
 	</platform>
+
+	<!-- Append plugin variables as preferences in config.xml -->
+	<config-file parent="/*" target="config.xml">
+		<preference name="TwinPush_AppId" value="$APP_ID"/>
+		<preference name="TwinPush_ApiKey" value="$API_KEY"/>
+		<preference name="TwinPush_Subdomain" value="$SUBDOMAIN"/>
+	</config-file>
 </plugin>
