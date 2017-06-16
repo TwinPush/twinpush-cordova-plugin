@@ -17,6 +17,8 @@
 			</feature>
 		</config-file>
 		<source-file src="src/ios/twinpush.m"/>
+		<source-file src="src/ios/AppDelegate+TwinPush.m"/>
+		<header-file src="src/ios/AppDelegate+TwinPush.h"/>
 		<framework src="TwinPushSDK" type="podspec" spec="2.2.0"/>
 	</platform>
 
