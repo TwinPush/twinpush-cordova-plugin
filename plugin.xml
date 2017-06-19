@@ -7,19 +7,27 @@
 	<preference name="SUBDOMAIN" default="app"/>
 
 	<js-module name="twinpush" src="www/twinpush.js">
-		<clobbers target="cordova.plugins.twinpush"/>
+		<clobbers target="twinpush"/>
 	</js-module>
 	<platform name="ios">
 		<config-file parent="/*" target="config.xml">
-			<feature name="twinpush">
-				<param name="ios-package" value="twinpush"/>
+			<feature name="TwinPush">
+				<param name="ios-package" value="TwinPush"/>
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
-		<source-file src="src/ios/twinpush.m"/>
-		<source-file src="src/ios/AppDelegate+TwinPush.m"/>
+		<header-file src="src/ios/TwinPush.h"/>
+		<source-file src="src/ios/TwinPush.m"/>
 		<header-file src="src/ios/AppDelegate+TwinPush.h"/>
+		<source-file src="src/ios/AppDelegate+TwinPush.m"/>
 		<framework src="TwinPushSDK" type="podspec" spec="2.2.0"/>
+
+	    <config-file target="*-Debug.plist" parent="aps-environment">
+      		<string>development</string>
+	    </config-file>
+	    <config-file target="*-Release.plist" parent="aps-environment">
+	      <string>production</string>
+	    </config-file>
 	</platform>
 
 	<!-- Append plugin variables as preferences in config.xml -->

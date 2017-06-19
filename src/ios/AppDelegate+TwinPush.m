@@ -12,12 +12,7 @@
     NSLog(@"Application did fail registering for remote notifications: %@", error);
 }
 
-- (void) application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    NSLog(@"Received notification with contents: %@", userInfo);
-    [[TwinPushManager manager] application:application didReceiveRemoteNotification:userInfo];
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     NSLog(@"Received notification with contents: %@", userInfo);
     [[TwinPushManager manager] application:application didReceiveRemoteNotification:userInfo];
 }
