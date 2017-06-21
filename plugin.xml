@@ -5,7 +5,7 @@
 	<preference name="APP_ID"/>
 	<preference name="API_KEY"/>
 	<preference name="SUBDOMAIN" default="app"/>
-	<preference name="GCM_SENDER" default=""/>
+	<preference name="GCM_SENDER" default=" "/>
 
 	<engines>
 		<engine name="cordova" version="&gt;=6.4.0"/>
