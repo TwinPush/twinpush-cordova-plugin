@@ -5,12 +5,14 @@
   "cordova": {
     "id": "twinpush-plugin",
     "platforms": [
-      "ios"
+      "ios",
+      "android"
     ]
   },
   "keywords": [
     "ecosystem:cordova",
-    "cordova-ios"
+    "cordova-ios",
+    "cordova-android"
   ],
   "author": "TwinCoders S.L.",
   "license": "MIT"
