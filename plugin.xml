@@ -38,7 +38,7 @@
 	<platform name="android">
 		<config-file parent="/*" target="res/xml/config.xml">
 			<feature name="TwinPush">
-				<param name="android-package" value="com.twinpush.cordova.PushPlugin"/>
+				<param name="android-package" value="com.twinpush.cordova.TwinPush"/>
 				<param name="onload" value="true"/>
 			</feature>
 		</config-file>
