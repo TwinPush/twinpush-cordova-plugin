@@ -1,4 +1,4 @@
-### Installation
+### Installation
 
 To install the plugin in your Cordova application, add the plugin using cordova CLI and add the required parameters:
 
