@@ -25,6 +25,7 @@ public class TwinPush extends CordovaPlugin {
         options.twinPushAppId = preferences.getString("TwinPush_AppId", "");
         options.twinPushApiKey = preferences.getString("TwinPush_ApiKey", "");
         options.subdomain = preferences.getString("TwinPush_Subdomain", "app");
+        options.gcmProjectNumber = preferences.getString("TwinPush_GcmSender", "app");
 
         twinpush().setup(options);
         twinpush().register();

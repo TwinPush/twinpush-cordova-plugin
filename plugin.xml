@@ -5,6 +5,7 @@
 	<preference name="APP_ID"/>
 	<preference name="API_KEY"/>
 	<preference name="SUBDOMAIN" default="app"/>
+	<preference name="GCM_SENDER" default=""/>
 
 	<engines>
 		<engine name="cordova" version="&gt;=6.4.0"/>
@@ -81,5 +82,6 @@
 		<preference name="TwinPush_AppId" value="$APP_ID"/>
 		<preference name="TwinPush_ApiKey" value="$API_KEY"/>
 		<preference name="TwinPush_Subdomain" value="$SUBDOMAIN"/>
+		<preference name="TwinPush_GcmSender" value="$GCM_SENDER"/>
 	</config-file>
 </plugin>
