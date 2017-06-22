@@ -30,5 +30,5 @@ You can set the device alias by calling the `setAlias` method of the `twinpush` 
         alert("Error calling setAlias method");
     }
 
-    twinPush.setAlias("email@company.com", success, failure);
+    twinpush.setAlias("email@company.com", success, failure);
     
