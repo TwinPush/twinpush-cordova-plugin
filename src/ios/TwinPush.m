@@ -39,4 +39,12 @@
     // Empty implementation. Don't show native view over Cordova webview
 }
 
+- (void)didFinishRegisteringDevice {
+    NSLog(@"Device registered to TwinPush successfully");
+}
+
+- (void)didFailRegisteringDevice:(NSString *)error {
+    NSLog(@"Failed to register to TwinPush: %@", error);
+}
+
 @end
