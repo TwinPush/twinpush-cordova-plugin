@@ -1,9 +1,14 @@
 package com.twinpush.cordova;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 
 import com.twincoders.twinpush.sdk.TwinPushSDK;
+import com.twincoders.twinpush.sdk.activities.RichNotificationActivity;
 import com.twincoders.twinpush.sdk.entities.TwinPushOptions;
+import com.twincoders.twinpush.sdk.notifications.PushNotification;
+import com.twincoders.twinpush.sdk.services.NotificationIntentService;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -29,6 +34,7 @@ public class TwinPush extends CordovaPlugin {
 
         twinpush().setup(options);
         twinpush().register();
+        checkPushNotification(cordova.getActivity().getIntent());
     }
 
     @Override
@@ -66,5 +72,25 @@ public class TwinPush extends CordovaPlugin {
     public void onStop() {
         super.onStop();
         twinpush().activityStop(cordova.getActivity());
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkPushNotification(intent);
+    }
+
+    // Checks if the intent contains a Push notification and displays rich content when appropriated
+    private void checkPushNotification(Intent intent) {
+        if (intent != null && intent.getAction() != null && intent.getAction().equals(NotificationIntentService.ON_NOTIFICATION_OPENED_ACTION)) {
+            PushNotification notification = (PushNotification) intent.getSerializableExtra(NotificationIntentService.EXTRA_NOTIFICATION);
+            twinpush().onNotificationOpen(notification);
+
+            if (notification != null && notification.isRichNotification()) {
+                Intent richIntent = new Intent(cordova.getActivity(), RichNotificationActivity.class);
+                richIntent.putExtra(NotificationIntentService.EXTRA_NOTIFICATION, notification);
+                cordova.getActivity().startActivity(richIntent);
+            }
+        }
     }
 }

@@ -73,6 +73,10 @@
 				</intent-filter>
 			</service>
 			<service android:exported="false" android:name="com.twincoders.twinpush.sdk.services.RegistrationIntentService"/>
+			<activity
+	            android:name="com.twincoders.twinpush.sdk.activities.RichNotificationActivity"
+	            android:theme="@android:style/Theme.Holo.NoActionBar">
+	        </activity>
 		</config-file>
 		<framework src="com.twinpush.android:sdk:2.3.0"/>
 		<source-file src="src/android/com/twinpush/cordova/TwinPush.java" target-dir="src/com/twinpush/cordova/"/>
