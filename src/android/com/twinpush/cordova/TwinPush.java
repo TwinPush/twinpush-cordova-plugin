@@ -34,27 +34,23 @@ public class TwinPush extends CordovaPlugin {
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
         if ("setAlias".equals(action)) {
-            cordova.getThreadPool().execute(new Runnable() {
-                public void run() {
-                    Log.v(LOG_TAG, "setAlias: data=" + data.toString());
-                    try {
-                        String alias = data.getJSONObject(0).getString("alias");
-                        twinpush().register(alias, new TwinPushSDK.OnRegistrationListener() {
-                            @Override
-                            public void onRegistrationSuccess(String currentAlias) {
-                                callbackContext.success("Successfully registered");
-                            }
-
-                            @Override
-                            public void onRegistrationError(Exception exception) {
-                                callbackContext.error(exception.getMessage());
-                            }
-                        });
-                    } catch (JSONException e) {
-                        callbackContext.error(e.getMessage());
+            Log.v(LOG_TAG, "setAlias: data=" + data.toString());
+            try {
+                String alias = data.getString(0);
+                twinpush().register(alias, new TwinPushSDK.OnRegistrationListener() {
+                    @Override
+                    public void onRegistrationSuccess(String currentAlias) {
+                        callbackContext.success("Successfully registered");
                     }
-                }
-            });
+
+                    @Override
+                    public void onRegistrationError(Exception exception) {
+                        callbackContext.error(exception.getMessage());
+                    }
+                });
+            } catch (JSONException e) {
+                callbackContext.error(e.getMessage());
+            }
             return true;
         }
         return false;
