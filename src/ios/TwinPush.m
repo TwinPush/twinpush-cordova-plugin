@@ -36,9 +36,6 @@
 }
 
 #pragma mark - TwinPushManagerDelegate
-- (void)showNotification:(TPNotification *)notification {
-    // Empty implementation. Don't show native view over Cordova webview
-}
 
 - (void)didFinishRegisteringDevice {
     NSLog(@"Device registered to TwinPush successfully");
