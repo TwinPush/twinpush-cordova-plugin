@@ -27,7 +27,7 @@
 		<source-file src="src/ios/TwinPush.m"/>
 		<header-file src="src/ios/AppDelegate+TwinPush.h"/>
 		<source-file src="src/ios/AppDelegate+TwinPush.m"/>
-		<framework spec="~> 3.1.0" src="TwinPushSDK" type="podspec"/>
+		<framework spec="~> 3.4.2" src="TwinPushSDK" type="podspec"/>
 		<config-file parent="aps-environment" target="*-Debug.plist">
 			<string>development</string>
 		</config-file>
