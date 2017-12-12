@@ -32,3 +32,32 @@ You can set the device alias by calling the `setAlias` method of the `twinpush` 
 
     twinpush.setAlias("email@company.com", success, failure);
     
+
+#### Device ID
+
+You can obtain the TwinPush identifier for the current device by calling the `getDeviceId` method of the `twinpush` module:
+
+    var success = function(deviceId) {
+        alert("Device ID: " + deviceId);
+    }
+
+    twinpush.getDeviceId(success);
+    
+If the device hasn't registered yet, `deviceId` will be `null`.
+    
+
+#### Register callback
+
+To perform some action when the registration against the TwinPush platform has been successful, you can register using `setRegisterCallback` method:
+
+    var success = function(deviceId) {
+        alert("Registered with Device ID: " + deviceId);
+    }
+
+    var failure = function() {
+        alert("Error registering device in TwinPush");
+    }
+
+    twinpush.setRegisterCallback(success, failure);
+    
+The callback will be called for every successfully register. Calling `setAlias` also triggers a register, so the callback will also be invoked when `setAlias` method is called.
