@@ -27,9 +27,7 @@
     }
 }
 
-- (void)setAlias:(CDVInvokedUrlCommand*)command
-{
-    NSLog(@"setAlias method called");
+- (void)setAlias:(CDVInvokedUrlCommand*)command {
     NSString* alias = [command.arguments objectAtIndex:0];
 
     self.aliasCommand = command;
@@ -46,9 +44,39 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
-- (void)isRegistered:(CDVInvokedUrlCommand *)command {
-    BOOL registered = [TwinPushManager manager].registered;
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:registered];
+- (void)setIntegerProperty:(CDVInvokedUrlCommand*)command {
+    NSString* key = [command.arguments objectAtIndex:0];
+    NSNumber* value = [command.arguments objectAtIndex:1];
+    
+    [[TwinPushManager manager] setProperty:key withIntegerValue:value];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:value.intValue];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)setFloatProperty:(CDVInvokedUrlCommand*)command {
+    NSString* key = [command.arguments objectAtIndex:0];
+    NSNumber* value = [command.arguments objectAtIndex:1];
+    
+    [[TwinPushManager manager] setProperty:key withFloatValue:value];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:value.doubleValue];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)setBooleanProperty:(CDVInvokedUrlCommand*)command {
+    NSString* key = [command.arguments objectAtIndex:0];
+    NSNumber* value = [command.arguments objectAtIndex:1];
+    
+    [[TwinPushManager manager] setProperty:key withBooleanValue:value];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:value.boolValue];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)setStringProperty:(CDVInvokedUrlCommand*)command {
+    NSString* key = [command.arguments objectAtIndex:0];
+    NSString* value = [command.arguments objectAtIndex:1];
+    
+    [[TwinPushManager manager] setProperty:key withStringValue:value];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 

@@ -9,7 +9,23 @@ module.exports = {
 		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setRegisterCallback', []);
 	},
 
-	getDeviceId: function(successCallback) {
-		cordova.exec(successCallback, () => {}, 'TwinPush', 'getDeviceId', []);	
-	}
+	getDeviceId: function(successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'getDeviceId', []);	
+	},
+
+	setIntegerProperty: function(key, value, successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setIntegerProperty', [key, value]);	
+	},
+
+	setFloatProperty: function(key, value, successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setFloatProperty', [key, value]);	
+	},
+
+	setBooleanProperty: function(key, value, successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setBooleanProperty', [key, value]);	
+	},
+
+	setStringProperty: function(key, value, successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setStringProperty', [key, value]);	
+	},
 }

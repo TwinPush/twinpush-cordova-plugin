@@ -62,8 +62,8 @@ public class TwinPush extends CordovaPlugin {
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
         try {
+            Log.v(LOG_TAG, action);
             if ("setAlias".equals(action)) {
-                Log.v(LOG_TAG, "setAlias: data=" + data.toString());
                 String alias = data.getString(0);
                 twinpush().register(alias, new TwinPushSDK.OnRegistrationListener() {
                     @Override
@@ -90,13 +90,41 @@ public class TwinPush extends CordovaPlugin {
                 return true;
             }
             else if ("setRegisterCallback".equals(action)) {
-                Log.v(LOG_TAG, "setRegisterCallback");
                 registerCallback = callbackContext;
                 return true;
             }
             else if ("getDeviceId".equals(action)) {
-                Log.v(LOG_TAG, "getDeviceId");
                 callbackContext.success(twinpush().getDeviceId());
+                return true;
+            }
+            else if ("setIntegerProperty".equals(action)) {
+                String key = data.getString(0);
+                Integer value = data.getInt(1);
+                twinpush().setProperty(key, value);
+                callbackContext.success(value);
+                return true;
+            }
+            else if ("setFloatProperty".equals(action)) {
+                String key = data.getString(0);
+                Double value = data.getDouble(1);
+                twinpush().setProperty(key, value);
+                PluginResult result = new PluginResult(PluginResult.Status.OK, value.floatValue());
+                callbackContext.sendPluginResult(result);
+                return true;
+            }
+            else if ("setBooleanProperty".equals(action)) {
+                String key = data.getString(0);
+                Boolean value = data.getBoolean(1);
+                twinpush().setProperty(key, value);
+                PluginResult result = new PluginResult(PluginResult.Status.OK, value);
+                callbackContext.sendPluginResult(result);
+                return true;
+            }
+            else if ("setStringProperty".equals(action)) {
+                String key = data.getString(0);
+                String value = data.getString(1);
+                twinpush().setProperty(key, value);
+                callbackContext.success(value);
                 return true;
             }
 

@@ -61,3 +61,22 @@ To perform some action when the registration against the TwinPush platform has b
     twinpush.setRegisterCallback(success, failure);
     
 The callback will be called for every successfully register. Calling `setAlias` also triggers a register, so the callback will also be invoked when `setAlias` method is called.
+
+#### Custom properties
+
+Custom properties can be set using the exposed methods of the TwinPush SDK. These properties will be sent to the server, and can be used for statistics generation and notification segmentation.
+
+Use the aproppiate method depending of the value type:
+
+    twinpush.setIntegerProperty("age", 23, function(value) {
+        alert("Age set to " + value)
+    });
+    twinpush.setFloatProperty("rating", 6.7, function(value) {
+        alert("Rating set to " + value)
+    });
+    twinpush.setBooleanProperty("single", false, function(value) {
+        alert("Single set to " + value)
+    });
+    twinpush.setStringProperty("fullName", "Bruce Wayne", function(value) {
+        alert("Full Name set to " + value)
+    });
