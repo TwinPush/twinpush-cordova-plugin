@@ -5,7 +5,6 @@
 	<preference name="APP_ID"/>
 	<preference name="API_KEY"/>
 	<preference name="SUBDOMAIN" default="app"/>
-	<preference name="GCM_SENDER" default=" "/>
 
 	<engines>
 		<engine name="cordova" version="&gt;=6.4.0"/>
@@ -27,7 +26,7 @@
 		<source-file src="src/ios/TwinPush.m"/>
 		<header-file src="src/ios/AppDelegate+TwinPush.h"/>
 		<source-file src="src/ios/AppDelegate+TwinPush.m"/>
-		<framework spec="~> 3.4.2" src="TwinPushSDK" type="podspec"/>
+		<framework spec="~> 3.7.3" src="TwinPushSDK" type="podspec"/>
 		<config-file parent="aps-environment" target="*-Debug.plist">
 			<string>development</string>
 		</config-file>
@@ -43,49 +42,27 @@
 				<param name="onload" value="true"/>
 			</feature>
 		</config-file>
-		<config-file parent="/manifest" target="AndroidManifest.xml">
-			<!-- [START twinpush_permission] -->
-			<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-			<!-- GCM connects to Internet Services. -->
-			<uses-permission android:name="android.permission.INTERNET"/>
-			<!-- Keeps the processor from sleeping when a message is received. -->
-			<uses-permission android:name="android.permission.WAKE_LOCK"/>
-			<!-- Permission to vibrate -->
-			<uses-permission android:name="android.permission.VIBRATE"/>
-			<!-- GCM requires a Google account (for Android version lower than 4.0.4) -->
-			<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-			<!-- Custom permission so only this application can receive GCM messages 
-			(not required for applications targeted to minSdkVersion 16 and higher) -->
-			<permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
-			<uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE"/>
-			<!-- [END twinpush_permission] -->
-		</config-file>
 		<config-file parent="/manifest/application" target="AndroidManifest.xml">
-			<receiver android:exported="true" android:name="com.google.android.gms.gcm.GcmReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+			<service
+					android:name="com.twincoders.twinpush.sdk.services.NotificationIntentService"
+					exported="false">
 				<intent-filter>
-					<action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-					<category android:name="$PACKAGE_NAME"/>
-				</intent-filter>
-			</receiver>
-			<service android:exported="false" android:name="com.twincoders.twinpush.sdk.services.NotificationIntentService">
-				<intent-filter>
-					<action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+					<action android:name="com.google.firebase.MESSAGING_EVENT" />
 				</intent-filter>
 			</service>
-			<service android:exported="false" android:name="com.twincoders.twinpush.sdk.services.RegistrationIntentService"/>
 			<activity
 	            android:name="com.twincoders.twinpush.sdk.activities.RichNotificationActivity"
 	            android:theme="@android:style/Theme.Holo.NoActionBar">
 	        </activity>
 		</config-file>
-		<framework src="com.twinpush.android:sdk:2.3.0"/>
+		<framework src="com.twinpush.android:sdk:2.7.6"/>
 		<source-file src="src/android/com/twinpush/cordova/TwinPush.java" target-dir="src/com/twinpush/cordova/"/>
+		<framework src="google-services.gradle" custom="true" type="gradleReference" />
 	</platform>
 	<!-- Append plugin variables as preferences in config.xml -->
 	<config-file parent="/*" target="config.xml">
 		<preference name="TwinPush_AppId" value="$APP_ID"/>
 		<preference name="TwinPush_ApiKey" value="$API_KEY"/>
 		<preference name="TwinPush_Subdomain" value="$SUBDOMAIN"/>
-		<preference name="TwinPush_GcmSender" value="$GCM_SENDER"/>
 	</config-file>
 </plugin>

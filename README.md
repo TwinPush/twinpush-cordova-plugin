@@ -12,7 +12,20 @@ This is the list of the allowed parameters, all of them must follow the format `
 
 - `SUBDOMAIN` variable is optional and defaults to `app`. It only has to be set if you are using a custom subdomain. It can be later modified as `TwinPush_Subdomain` in the project _config.xml_ file.
 
-- `GCM_SENDER` is required for Android builds. It indicates the sender identifier for Google Cloud Messaging. It can be obtained in the GCM web console. It can be later modified as `TwinPush_GcmSender` in the project _config.xml_ file.
+
+#### FCM configuration for Android
+
+Make sure you've correctly [setup Firebase Cloud Messaging](http://developers.twinpush.com/developers/android#setup-firebase-cloud-messaging) and [created your Application in TwinPush](http://developers.twinpush.com/developers/android#register-your-application-in-twinpush) before continuing.
+
+Access to the [Firebase console](https://console.firebase.google.com) and [download `google-services.json`](https://support.google.com/firebase/answer/7015592) for your current project.
+
+Then use `<resource-file>` in your `config.xml` to copy the file into appropriate folder:
+
+    <platform name="android">
+        <resource-file src="google-services.json" target="app/google-services.json" />
+        ...
+    </platform>
+    
 
 ### Basic TwinPush integration
     
@@ -24,11 +37,11 @@ You can set the device alias by calling the `setAlias` method of the `twinpush` 
 
     var success = function(message) {
         alert(message); // This is only for testing purposes
-    }
+    };
 
     var failure = function() {
         alert("Error calling setAlias method");
-    }
+    };
 
     twinpush.setAlias("email@company.com", success, failure);
     
@@ -39,7 +52,7 @@ You can obtain the TwinPush identifier for the current device by calling the `ge
 
     var success = function(deviceId) {
         alert("Device ID: " + deviceId);
-    }
+    };
 
     twinpush.getDeviceId(success);
     
@@ -52,11 +65,11 @@ To perform some action when the registration against the TwinPush platform has b
 
     var success = function(deviceId) {
         alert("Registered with Device ID: " + deviceId);
-    }
+    };
 
     var failure = function() {
         alert("Error registering device in TwinPush");
-    }
+    };
 
     twinpush.setRegisterCallback(success, failure);
     
@@ -69,14 +82,14 @@ Custom properties can be set using the exposed methods of the TwinPush SDK. Thes
 Use the aproppiate method depending of the value type:
 
     twinpush.setIntegerProperty("age", 23, function(value) {
-        alert("Age set to " + value)
+        alert("Age set to " + value);
     });
     twinpush.setFloatProperty("rating", 6.7, function(value) {
-        alert("Rating set to " + value)
+        alert("Rating set to " + value);
     });
     twinpush.setBooleanProperty("single", false, function(value) {
-        alert("Single set to " + value)
+        alert("Single set to " + value);
     });
     twinpush.setStringProperty("fullName", "Bruce Wayne", function(value) {
-        alert("Full Name set to " + value)
+        alert("Full Name set to " + value);
     });
