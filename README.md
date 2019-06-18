@@ -3,7 +3,7 @@
 To install the plugin in your Cordova application, add the plugin using cordova CLI and add the required parameters:
 
     cordova plugin add https://github.com/TwinPush/twinpush-cordova-plugin.git --variable APP_ID="YOUR_APP_ID" --variable API_KEY="YOUR_API_KEY"
-    
+
 This is the list of the allowed parameters, all of them must follow the format `--variable VARIABLE_NAME="VARIABLE_VALUE"` and can be later modified in the `config.xml` file as preferences:
 
 - `APP_ID` is the Application Identifier in the TwinPush platform. It can be obtained from the TwinPush web console in the Application settings section. This parameter is required. It can be later modified as `TwinPush_AppId` in the project _config.xml_ file.
@@ -25,10 +25,17 @@ Then use `<resource-file>` in your `config.xml` to copy the file into appropriat
         <resource-file src="google-services.json" target="app/google-services.json" />
         ...
     </platform>
-    
+
+
+### Ionic
+
+TwinPush Plugin for Cordova also provides type definition for TypeScript to provide out-of-the-box compatibility with Ionic. To access the TwinPush plugin, simply add `import 'twinpush';` sentence in your component. You'll have access to the global `twinpush` variable and your IDE will provide auto-completion and type safety.
+
+![](https://i.imgur.com/n9Ijquz.png)
+
 
 ### Basic TwinPush integration
-    
+
 Once installed, the plugin will automatically register for push notifications and track activity events. You can extend the default integration by calling the exposed TwinPush methods.
 
 #### Alias
@@ -44,7 +51,7 @@ You can set the device alias by calling the `setAlias` method of the `twinpush` 
     };
 
     twinpush.setAlias("email@company.com", success, failure);
-    
+
 
 #### Device ID
 
@@ -55,9 +62,9 @@ You can obtain the TwinPush identifier for the current device by calling the `ge
     };
 
     twinpush.getDeviceId(success);
-    
+
 If the device hasn't registered yet, `deviceId` will be `null`.
-    
+
 
 #### Register callback
 
@@ -72,7 +79,7 @@ To perform some action when the registration against the TwinPush platform has b
     };
 
     twinpush.setRegisterCallback(success, failure);
-    
+
 The callback will be called for every successfully register. Calling `setAlias` also triggers a register, so the callback will also be invoked when `setAlias` method is called.
 
 #### Custom properties

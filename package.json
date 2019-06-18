@@ -2,6 +2,7 @@
   "name": "twinpush",
   "version": "1.0.0",
   "description": "Cordova wrapper for the native TwinPush SDK",
+  "types": "./types/index.d.ts",
   "cordova": {
     "id": "twinpush-plugin",
     "platforms": [
