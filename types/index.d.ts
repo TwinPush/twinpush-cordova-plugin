@@ -8,4 +8,4 @@ interface TwinPush {
     setStringProperty(key: string, value: string, successCallback: (value: string) => void, errorCallback?: (error: string) => void);
 }
 
-declare var twinpush: TwinPush;
+export declare var twinpush: TwinPush;
