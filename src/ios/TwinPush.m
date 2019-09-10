@@ -28,7 +28,7 @@
 }
 
 - (void)setAlias:(CDVInvokedUrlCommand*)command {
-    NSString* alias = [command.arguments objectAtIndex:0];
+    NSString* alias = [command argumentAtIndex:0];
 
     self.aliasCommand = command;
     [TwinPushManager manager].alias = alias;
@@ -45,8 +45,8 @@
 }
 
 - (void)setIntegerProperty:(CDVInvokedUrlCommand*)command {
-    NSString* key = [command.arguments objectAtIndex:0];
-    NSNumber* value = [command.arguments objectAtIndex:1];
+    NSString* key = [command argumentAtIndex:0];
+    NSNumber* value = [command argumentAtIndex:1];
     
     [[TwinPushManager manager] setProperty:key withIntegerValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:value.intValue];
@@ -54,8 +54,8 @@
 }
 
 - (void)setFloatProperty:(CDVInvokedUrlCommand*)command {
-    NSString* key = [command.arguments objectAtIndex:0];
-    NSNumber* value = [command.arguments objectAtIndex:1];
+    NSString* key = [command argumentAtIndex:0];
+    NSNumber* value = [command argumentAtIndex:1];
     
     [[TwinPushManager manager] setProperty:key withFloatValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:value.doubleValue];
@@ -63,8 +63,8 @@
 }
 
 - (void)setBooleanProperty:(CDVInvokedUrlCommand*)command {
-    NSString* key = [command.arguments objectAtIndex:0];
-    NSNumber* value = [command.arguments objectAtIndex:1];
+    NSString* key = [command argumentAtIndex:0];
+    NSNumber* value = [command argumentAtIndex:1];
     
     [[TwinPushManager manager] setProperty:key withBooleanValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:value.boolValue];
@@ -72,11 +72,45 @@
 }
 
 - (void)setStringProperty:(CDVInvokedUrlCommand*)command {
-    NSString* key = [command.arguments objectAtIndex:0];
-    NSString* value = [command.arguments objectAtIndex:1];
+    NSString* key = [command argumentAtIndex:0];
+    NSString* value = [command argumentAtIndex:1];
     
     [[TwinPushManager manager] setProperty:key withStringValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)setLocation:(CDVInvokedUrlCommand *)command {
+    double latitude = [[command argumentAtIndex:0] doubleValue];
+    double longitude = [[command argumentAtIndex:1] doubleValue];
+    
+    [[TwinPushManager manager] setLocationWithLatitude:latitude longitude:longitude];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:YES];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)updateLocation:(CDVInvokedUrlCommand *)command {
+    TPLocationPrecision precision = [[command argumentAtIndex:0 withDefault:@(TPLocationPrecisionMedium)] unsignedIntegerValue];
+    TPLocationAccuracy accuracy;
+    switch (precision) {
+        case TPLocationPrecisionLow:
+            accuracy = TPLocationAccuracyLow;
+            break;
+        case TPLocationPrecisionHigh:
+            accuracy = TPLocationAccuracyHigh;
+            break;
+        case TPLocationPrecisionFine:
+            accuracy = TPLocationAccuracyFine;
+            break;
+        case TPLocationPrecisionCoarse:
+            accuracy = TPLocationAccuracyCoarse;
+            break;
+        default:
+            accuracy = TPLocationAccuracyMedium;
+            break;
+    }
+    [[TwinPushManager manager] updateLocation:accuracy];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:YES];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 

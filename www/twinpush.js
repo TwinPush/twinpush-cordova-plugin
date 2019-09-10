@@ -1,6 +1,14 @@
 var exec = require('cordova/exec');
 
 module.exports = {
+    LocationAccuracy: {
+        FINE: 0,
+        HIGH: 1,
+        MEDIUM: 2,
+        LOW: 3,
+        COARSE: 4
+    },
+
 	setAlias: function(alias, successCallback, errorCallback = () => {}) {
 		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setAlias', [alias]);
 	},
@@ -27,5 +35,13 @@ module.exports = {
 
 	setStringProperty: function(key, value, successCallback, errorCallback = () => {}) {
 		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setStringProperty', [key, value]);	
+	},
+
+	setLocation: function(latitude, longitude, successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setLocation', [latitude, longitude]);
+	},
+
+	updateLocation: function(accuracy, successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'updateLocation', [accuracy]);
 	},
 }

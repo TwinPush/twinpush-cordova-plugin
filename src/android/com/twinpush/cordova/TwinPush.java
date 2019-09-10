@@ -7,6 +7,7 @@ import android.util.Log;
 import com.twincoders.twinpush.sdk.TwinPushSDK;
 import com.twincoders.twinpush.sdk.activities.RichNotificationActivity;
 import com.twincoders.twinpush.sdk.entities.TwinPushOptions;
+import com.twincoders.twinpush.sdk.entities.LocationPrecision;
 import com.twincoders.twinpush.sdk.notifications.PushNotification;
 import com.twincoders.twinpush.sdk.services.NotificationIntentService;
 
@@ -18,6 +19,12 @@ import org.json.JSONException;
 
 public class TwinPush extends CordovaPlugin {
     private static final String LOG_TAG = "TwinPush";
+
+    private static final int FINE = 0;
+    private static final int HIGH = 1;
+    private static final int MEDIUM = 2;
+    private static final int LOW = 3;
+    private static final int COARSE = 4;
 
     private TwinPushSDK twinpush() {
         return TwinPushSDK.getInstance(cordova.getActivity());
@@ -124,6 +131,37 @@ public class TwinPush extends CordovaPlugin {
                 String value = data.getString(1);
                 twinpush().setProperty(key, value);
                 callbackContext.success(value);
+                return true;
+            }
+            else if ("setLocation".equals(action)) {
+                Double latitude = data.getDouble(0);
+                Double longitude = data.getDouble(1);
+                twinpush().setLocation(latitude, longitude);
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
+                return true;
+            }
+            else if ("updateLocation".equals(action)) {
+                int accuracy = data.getInt(0);
+                LocationPrecision precision;
+                switch (accuracy) {
+                    case FINE:
+                        precision = LocationPrecision.FINE;
+                        break;
+                    case HIGH:
+                        precision = LocationPrecision.HIGH;
+                        break;
+                    case LOW:
+                        precision = LocationPrecision.LOW;
+                        break;
+                    case COARSE:
+                        precision = LocationPrecision.COARSE;
+                        break;
+                    default:
+                        precision = LocationPrecision.MEDIUM;
+                        break;
+                }
+                twinpush().updateLocation(precision);
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
                 return true;
             }
 
