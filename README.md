@@ -17,7 +17,7 @@ This is the list of the allowed parameters, all of them must follow the format `
 
 Make sure you've correctly [setup Firebase Cloud Messaging](http://developers.twinpush.com/developers/android#setup-firebase-cloud-messaging) and [created your Application in TwinPush](http://developers.twinpush.com/developers/android#register-your-application-in-twinpush) before continuing.
 
-Access to the [Firebase console](https://console.firebase.google.com) and [download `google-services.json`](https://support.google.com/firebase/answer/7015592) for your current project.
+Access to the [Firebase console](https://console.firebase.google.com) and [download `google-services.json`](https://support.google.com/firebase/answer/7015592) for your current project and place it in your project root folder.
 
 Then use `<resource-file>` in your `config.xml` to copy the file into appropriate folder:
 
@@ -26,6 +26,24 @@ Then use `<resource-file>` in your `config.xml` to copy the file into appropriat
         ...
     </platform>
 
+This step may ocasionally cause compilation errors due to gradle daemons locking the file. In that case, make sure to stop all gradle daemons before compiling with `gradle --stop`.
+
+#### Location privacy configuration for iOS
+
+TwinPush makes use of the Location API for iOS and Apple requires that all applications that use Location API must include a usage description in the plist file. The easiest way to achieve it is by adding a `edit-config` entry inside your platform configuration for iOS in your `config.xml`:
+
+    <platform name="ios">
+        <edit-config target="NSLocationAlwaysAndWhenInUseUsageDescription" file="*-Info.plist" mode="merge">
+            <string>your custom text here</string>
+        </edit-config>
+        <edit-config target="NSLocationAlwaysUsageDescription" file="*-Info.plist" mode="merge">
+            <string>your custom text here</string>
+        </edit-config>
+    </platform>
+
+The text will be shown to the user when asked for permission.
+
+AppStore submissions requires that applications that references the Location API must include this description even when they're not acively using this functionality.
 
 ### Ionic
 
@@ -100,3 +118,24 @@ Use the aproppiate method depending of the value type:
     twinpush.setStringProperty("fullName", "Bruce Wayne", function(value) {
         alert("Full Name set to " + value);
     });
+
+#### Updating location
+
+User location can be sent to TwinPush in order to perform geo-located segments. Two methods are provided to send the location either explicitly or automatically:
+
+    twinpush.setLocation(40.416616, -3.704415, function(value) {
+        alert("Location explicitly set");
+    });
+    twinpush.updateLocation(twinpush.LocationPrecision.HIGH, function(value) {
+        alert("Location automatically set");
+    });
+
+Precision for `updateLocation` method can be one of these values:
+- `FINE`
+- `HIGH`
+- `MEDIUM`
+- `LOW`
+- `COARSE`
+
+Higher precisions may take longer to obtain and will drain more battery.
+
