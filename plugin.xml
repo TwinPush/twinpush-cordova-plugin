@@ -26,7 +26,7 @@
 		<source-file src="src/ios/TwinPush.m"/>
 		<header-file src="src/ios/AppDelegate+TwinPush.h"/>
 		<source-file src="src/ios/AppDelegate+TwinPush.m"/>
-		<framework spec="~> 3.10.0" src="TwinPushSDK" type="podspec"/>
+		<framework spec="~> 4.0.0" src="TwinPushSDK" type="podspec"/>
 		<config-file parent="aps-environment" target="*-Debug.plist">
 			<string>development</string>
 		</config-file>
@@ -55,7 +55,7 @@
 	            android:theme="@android:style/Theme.Holo.NoActionBar">
 	        </activity>
 		</config-file>
-		<framework src="com.twinpush.android:sdk:3.0.0"/>
+		<framework src="com.twinpush.android:sdk:3.2.2"/>
 		<source-file src="src/android/com/twinpush/cordova/TwinPush.java" target-dir="src/com/twinpush/cordova/"/>
 		<framework src="google-services.gradle" custom="true" type="gradleReference" />
 	</platform>
