@@ -31,6 +31,7 @@ public class TwinPush extends CordovaPlugin {
     }
 
     private CallbackContext registerCallback;
+    private CallbackContext notificationOpenCallback;
 
     @Override
     protected void pluginInitialize() {
@@ -97,6 +98,10 @@ public class TwinPush extends CordovaPlugin {
             }
             else if ("setRegisterCallback".equals(action)) {
                 registerCallback = callbackContext;
+                return true;
+            }
+            else if ("setNotificationOpenCallback".equals(action)) {
+                notificationOpenCallback = callbackContext;
                 return true;
             }
             else if ("getDeviceId".equals(action)) {
@@ -195,6 +200,19 @@ public class TwinPush extends CordovaPlugin {
             PushNotification notification = (PushNotification) intent.getSerializableExtra(NotificationIntentService.EXTRA_NOTIFICATION);
             twinpush().onNotificationOpen(notification);
 
+            if (notification != null && notificationOpenCallback != null) {
+                JSONObject json = new JSONObject();
+                jsonObject.put("notificationId", notification.id);
+                jsonObject.put("message", notification.message);
+                jsonObject.put("title", notification.title);
+                jsonObject.put("contentUrl", notification.richURL);
+                jsonObject.put("tags", notification.id);
+                jsonObject.put("customProperties", notification.id);
+                jsonObject.put("date", notification.date);
+                PluginResult result = new PluginResult(PluginResult.Status.OK, json.toString());
+                notificationOpenCallback.sendPluginResult(result);
+
+            }
             if (notification != null && notification.isRichNotification()) {
                 Intent richIntent = new Intent(cordova.getActivity(), RichNotificationActivity.class);
                 richIntent.putExtra(NotificationIntentService.EXTRA_NOTIFICATION, notification);
