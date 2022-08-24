@@ -2,6 +2,7 @@
 interface TwinPush {
     setAlias(alias: string, successCallback: () => void, errorCallback?: (error: string) => void);
     setRegisterCallback(successCallback: (deviceId: string) => void, errorCallback?: (error: string) => void);
+    setNotificationOpenCallback(callback: (notification: TPNotification) => void);
     getDeviceId(successCallback: (deviceId: string) => void, errorCallback?: (error: string) => void);
     setIntegerProperty(key: string, value: number, successCallback: (value: number) => void, errorCallback?: (error: string) => void);
     setFloatProperty(key: string, value: number, successCallback: (value: number) => void, errorCallback?: (error: string) => void);
@@ -12,3 +13,14 @@ interface TwinPush {
 }
 
 export declare var twinpush: TwinPush;
+
+interface TPNotification {
+    notificationId: string;
+    message: string;
+    title: string;
+    subtitle: string;
+    contentUrl: string;
+    tags: string[];
+    customProperties: {};
+    date: Date;
+}
