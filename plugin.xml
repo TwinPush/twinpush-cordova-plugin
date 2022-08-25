@@ -55,9 +55,10 @@
 	            android:theme="@android:style/Theme.Holo.NoActionBar">
 	        </activity>
 		</config-file>
-		<framework src="com.twinpush.android:sdk:3.2.2"/>
+		<framework src="com.github.twinpush:android-sdk:3.5.7"/>
 		<source-file src="src/android/com/twinpush/cordova/TwinPush.java" target-dir="src/com/twinpush/cordova/"/>
 		<framework src="google-services.gradle" custom="true" type="gradleReference" />
+		<framework src="dependency-repositories.gradle" custom="true" type="gradleReference" />
 	</platform>
 	<!-- Append plugin variables as preferences in config.xml -->
 	<config-file parent="/*" target="config.xml">
