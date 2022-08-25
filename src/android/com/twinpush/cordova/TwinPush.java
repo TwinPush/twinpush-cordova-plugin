@@ -1,13 +1,12 @@
 package com.twinpush.cordova;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 
 import com.twincoders.twinpush.sdk.TwinPushSDK;
 import com.twincoders.twinpush.sdk.activities.RichNotificationActivity;
-import com.twincoders.twinpush.sdk.entities.TwinPushOptions;
 import com.twincoders.twinpush.sdk.entities.LocationPrecision;
+import com.twincoders.twinpush.sdk.entities.TwinPushOptions;
 import com.twincoders.twinpush.sdk.notifications.PushNotification;
 import com.twincoders.twinpush.sdk.services.NotificationIntentService;
 
@@ -16,6 +15,9 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Console;
 
 public class TwinPush extends CordovaPlugin {
     private static final String LOG_TAG = "TwinPush";
@@ -201,16 +203,22 @@ public class TwinPush extends CordovaPlugin {
             twinpush().onNotificationOpen(notification);
 
             if (notification != null && notificationOpenCallback != null) {
-                JSONObject json = new JSONObject();
-                jsonObject.put("notificationId", notification.id);
-                jsonObject.put("message", notification.message);
-                jsonObject.put("title", notification.title);
-                jsonObject.put("contentUrl", notification.richURL);
-                jsonObject.put("tags", notification.id);
-                jsonObject.put("customProperties", notification.id);
-                jsonObject.put("date", notification.date);
-                PluginResult result = new PluginResult(PluginResult.Status.OK, json.toString());
-                notificationOpenCallback.sendPluginResult(result);
+                try {
+                    JSONObject json = new JSONObject();
+                    json.put("notificationId", notification.getId());
+                    json.put("message", notification.getMessage());
+                    json.put("title", notification.getTitle());
+                    json.put("contentUrl", notification.getRichURL());
+                    json.put("tags", notification.getTags());
+                    json.put("customProperties", notification.getCustomProperties());
+                    json.put("date", notification.getDate());
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, json.toString());
+                    notificationOpenCallback.sendPluginResult(result);
+                }
+                catch (JSONException e) {
+                    PluginResult result = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
+                    notificationOpenCallback.sendPluginResult(result);
+                }
 
             }
             if (notification != null && notification.isRichNotification()) {
