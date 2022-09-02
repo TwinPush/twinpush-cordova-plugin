@@ -17,7 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Console;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class TwinPush extends CordovaPlugin {
     private static final String LOG_TAG = "TwinPush";
@@ -233,6 +234,7 @@ public class TwinPush extends CordovaPlugin {
 
     private void sendNotificationToCallback(PushNotification notification) {
         try {
+
             // Send notification serialized as JSON, Javascript plugin will deserialize it
             JSONObject json = new JSONObject();
             json.put("notificationId", notification.getId());
@@ -243,7 +245,10 @@ public class TwinPush extends CordovaPlugin {
             if (notification.getCustomProperties() != null) {
                 json.put("customProperties", new JSONObject(notification.getCustomProperties()));
             }
-            json.put("date", notification.getDate());
+            if (notification.getDate() != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                json.put("date", sdf.format(notification.getDate()));
+            }
             PluginResult result = new PluginResult(PluginResult.Status.OK, json.toString());
 
             Log.v(LOG_TAG, "Sending push notification to callback listener: " + json);
