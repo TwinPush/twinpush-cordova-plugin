@@ -13,8 +13,8 @@ module.exports = {
 		cordova.exec(successCallback, errorCallback, 'TwinPush', 'setAlias', [alias]);
 	},
 
-	setNotificationOpenCallback: function(successCallback) {
-    	cordova.exec(json => successCallback(JSON.parse(json)), () => {}, 'TwinPush', 'setNotificationOpenCallback', []);
+	setNotificationOpenCallback: function(successCallback, errorCallback = () => {}) {
+    	cordova.exec(json => successCallback(JSON.parse(json)), errorCallback, 'TwinPush', 'setNotificationOpenCallback', []);
 	},
 
 	setRegisterCallback: function(successCallback, errorCallback = () => {}) {
