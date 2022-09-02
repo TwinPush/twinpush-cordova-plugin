@@ -22,5 +22,5 @@ interface TPNotification {
     contentUrl: string;
     tags: string[];
     customProperties: {};
-    date: Date;
+    date: string; // ISO-8601 format
 }
