@@ -35,6 +35,8 @@ public class TwinPush extends CordovaPlugin {
     private CallbackContext registerCallback;
     private CallbackContext notificationOpenCallback;
 
+    private PushNotification lastNotification;
+
     @Override
     protected void pluginInitialize() {
         super.pluginInitialize();
@@ -104,6 +106,12 @@ public class TwinPush extends CordovaPlugin {
             }
             else if ("setNotificationOpenCallback".equals(action)) {
                 notificationOpenCallback = callbackContext;
+
+                // Send saved notification if any
+                if (lastNotification != null) {
+                    sendNotificationToCallback(lastNotification);
+                    lastNotification = null;
+                }
                 return true;
             }
             else if ("getDeviceId".equals(action)) {
@@ -200,32 +208,51 @@ public class TwinPush extends CordovaPlugin {
     private void checkPushNotification(Intent intent) {
         if (intent != null && intent.getAction() != null && intent.getAction().equals(NotificationIntentService.ON_NOTIFICATION_OPENED_ACTION)) {
             PushNotification notification = (PushNotification) intent.getSerializableExtra(NotificationIntentService.EXTRA_NOTIFICATION);
+            if (notification == null) {
+                return;
+            }
+
             twinpush().onNotificationOpen(notification);
 
-            if (notification != null && notificationOpenCallback != null) {
-                try {
-                    JSONObject json = new JSONObject();
-                    json.put("notificationId", notification.getId());
-                    json.put("message", notification.getMessage());
-                    json.put("title", notification.getTitle());
-                    json.put("contentUrl", notification.getRichURL());
-                    json.put("tags", notification.getTags());
-                    json.put("customProperties", notification.getCustomProperties());
-                    json.put("date", notification.getDate());
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, json.toString());
-                    notificationOpenCallback.sendPluginResult(result);
-                }
-                catch (JSONException e) {
-                    PluginResult result = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
-                    notificationOpenCallback.sendPluginResult(result);
-                }
-
+            Log.v(LOG_TAG, "Received push notification");
+            if (notificationOpenCallback != null) {
+                sendNotificationToCallback(notification);
             }
-            if (notification != null && notification.isRichNotification()) {
+            else {
+                // No listener registered, save notification for later use
+                lastNotification = notification;
+            }
+
+            if (notification.isRichNotification()) {
                 Intent richIntent = new Intent(cordova.getActivity(), RichNotificationActivity.class);
                 richIntent.putExtra(NotificationIntentService.EXTRA_NOTIFICATION, notification);
                 cordova.getActivity().startActivity(richIntent);
             }
+        }
+    }
+
+    private void sendNotificationToCallback(PushNotification notification) {
+        try {
+            // Send notification serialized as JSON, Javascript plugin will deserialize it
+            JSONObject json = new JSONObject();
+            json.put("notificationId", notification.getId());
+            json.put("message", notification.getMessage());
+            json.put("title", notification.getTitle());
+            json.put("contentUrl", notification.getRichURL());
+            json.put("tags", notification.getTags());
+            if (notification.getCustomProperties() != null) {
+                json.put("customProperties", new JSONObject(notification.getCustomProperties()));
+            }
+            json.put("date", notification.getDate());
+            PluginResult result = new PluginResult(PluginResult.Status.OK, json.toString());
+
+            Log.v(LOG_TAG, "Sending push notification to callback listener: " + json);
+
+            notificationOpenCallback.sendPluginResult(result);
+        }
+        catch (JSONException e) {
+            PluginResult result = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
+            notificationOpenCallback.sendPluginResult(result);
         }
     }
 }
