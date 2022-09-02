@@ -100,6 +100,31 @@ To perform some action when the registration against the TwinPush platform has b
 
 The callback will be called for every successfully register. Calling `setAlias` also triggers a register, so the callback will also be invoked when `setAlias` method is called.
 
+#### Notification open callback
+
+To perform some action the user opens a received notification you can setup a callback function using `setNotificationOpenCallback` method:
+
+    twinpush.setNotificationOpenCallback(
+        function(notification) {
+          console.info("Opened notification " + JSON.stringify(notification));
+        }
+    );
+
+The received notification object implements the following interface:
+
+    interface TPNotification {
+        notificationId: string;
+        message: string;
+        title: string;
+        subtitle: string;
+        contentUrl: string;
+        tags: string[];
+        customProperties: {};
+        date: string; // ISO-8601 format
+    }
+
+The callback function will be called when the user opens the notification in the notification center in iOS and Android, and when the notification is received while the application is in foreground for iOS devices.
+
 #### Custom properties
 
 Custom properties can be set using the exposed methods of the TwinPush SDK. These properties will be sent to the server, and can be used for statistics generation and notification segmentation.
