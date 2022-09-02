@@ -5,6 +5,8 @@
 @interface TwinPush()
 @property (nonatomic, retain) CDVInvokedUrlCommand* aliasCommand;
 @property (nonatomic, retain) CDVInvokedUrlCommand* registerCallbackCommand;
+@property (nonatomic, retain) CDVInvokedUrlCommand* notificationOpenCallbackCommand;
+@property (nonatomic, retain) TPNotification* lastReceivedNotification;
 @end
 
 @implementation TwinPush
@@ -36,6 +38,15 @@
 
 - (void)setRegisterCallback:(CDVInvokedUrlCommand *)command {
     self.registerCallbackCommand = command;
+}
+
+- (void)setNotificationOpenCallback:(CDVInvokedUrlCommand *)command {
+    self.notificationOpenCallbackCommand = command;
+    
+    if (_lastReceivedNotification != nil) {
+        [self sendNotificationOpenToCallback:_lastReceivedNotification];
+        _lastReceivedNotification = nil;
+    }
 }
 
 - (void)getDeviceId:(CDVInvokedUrlCommand *)command {
@@ -114,6 +125,25 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
+- (void)sendNotificationOpenToCallback:(TPNotification*)notification {
+    NSISO8601DateFormatter* dateFormatter = [[NSISO8601DateFormatter alloc] init];
+    NSDictionary* notificationDict = @{
+        @"notificationId": notification.notificationId ?: [NSNull null],
+        @"message": notification.message ?: [NSNull null],
+        @"title": notification.title ?: [NSNull null],
+        @"subtitle": notification.subtitle ?: [NSNull null],
+        @"contentUrl": notification.contentUrl ?: [NSNull null],
+        @"tags": notification.tags ?: [NSNull null],
+        @"customProperties": notification.customProperties ?: [NSNull null],
+        @"date": [dateFormatter stringFromDate:notification.date]
+    };
+    
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:notificationDict options:0 error:nil];
+    NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:jsonString];
+    [self.commandDelegate sendPluginResult:result callbackId:_notificationOpenCallbackCommand.callbackId];
+}
+
 #pragma mark - TwinPushManagerDelegate
 
 - (void)didFinishRegisteringDevice {
@@ -156,6 +186,16 @@
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
         pluginResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.registerCallbackCommand.callbackId];
+    }
+}
+
+- (void)showNotification:(TPNotification *)notification {
+    if (_registerCallbackCommand != nil) {
+        [self sendNotificationOpenToCallback:notification];
+    }
+    else {
+        // Save notification in case the callback is registered after the notification is received
+        self.lastReceivedNotification = notification;
     }
 }
 
