@@ -47,9 +47,23 @@ AppStore submissions requires that applications that references the Location API
 
 ### Ionic
 
-TwinPush Plugin for Cordova also provides type definition for TypeScript to provide out-of-the-box compatibility with Ionic. To access the TwinPush plugin, simply add `import 'twinpush';` sentence in your component. You'll have access to the global `twinpush` variable and your IDE will provide auto-completion and type safety.
+To include TwinPush plugin for Ionic, instead of invoking Cordova directly, use it through Ionic command line:
 
-![](https://i.imgur.com/n9Ijquz.png)
+```
+ionic cordova plugin add https://github.com/TwinPush/twinpush-cordova-plugin.git --variable APP_ID="YOUR_APP_ID" --variable API_KEY="YOUR_API_KEY"
+```
+
+TwinPush Plugin for Cordova also provides type definition for TypeScript to provide out-of-the-box compatibility with Ionic.
+TwinPush plugin is accessible through `window.twinpush` variable, to enable IDE auto-completion and type safety simply cast it to `TwinPush` type as following:
+
+```
+import { TwinPush } from 'twinpush';
+const twinpush = (window as any).twinpush as TwinPush;
+```
+
+Example code:
+
+![](https://i.imgur.com/FThfmlD.png)
 
 
 ### Basic TwinPush integration
@@ -60,26 +74,23 @@ Once installed, the plugin will automatically register for push notifications an
 
 You can set the device alias by calling the `setAlias` method of the `twinpush` module:
 
-    var success = function(message) {
-        alert(message); // This is only for testing purposes
-    };
-
-    var failure = function() {
-        alert("Error calling setAlias method");
-    };
-
-    twinpush.setAlias("email@company.com", success, failure);
+    twinpush.setAlias('new_device@gmail.com',
+        () => {
+          console.log('Set alias success');
+        },
+        () => {
+          console.log('Error calling setAlias method');
+        }
+    );
 
 
 #### Device ID
 
 You can obtain the TwinPush identifier for the current device by calling the `getDeviceId` method of the `twinpush` module:
 
-    var success = function(deviceId) {
-        alert("Device ID: " + deviceId);
-    };
-
-    twinpush.getDeviceId(success);
+    twinpush.getDeviceId(deviceId => {
+        console.log('Device ID: ' + deviceId);
+    });
 
 If the device hasn't registered yet, `deviceId` will be `null`.
 
@@ -88,15 +99,14 @@ If the device hasn't registered yet, `deviceId` will be `null`.
 
 To perform some action when the registration against the TwinPush platform has been successful, you can register using `setRegisterCallback` method:
 
-    var success = function(deviceId) {
-        alert("Registered with Device ID: " + deviceId);
-    };
-
-    var failure = function() {
-        alert("Error registering device in TwinPush");
-    };
-
-    twinpush.setRegisterCallback(success, failure);
+    twinpush.setRegisterCallback(
+        (msg) => {
+          console.log('Register success');
+        },
+        () => {
+          console.log('Error calling setRegisterCallback method');
+        }
+    );
 
 The callback will be called for every successfully register. Calling `setAlias` also triggers a register, so the callback will also be invoked when `setAlias` method is called.
 
@@ -104,11 +114,10 @@ The callback will be called for every successfully register. Calling `setAlias` 
 
 To perform some action the user opens a received notification you can setup a callback function using `setNotificationOpenCallback` method:
 
-    twinpush.setNotificationOpenCallback(
-        function(notification) {
-          console.info("Opened notification " + JSON.stringify(notification));
-        }
-    );
+    twinpush.setNotificationOpenCallback((notification) => {
+        console.log('Received notification ' + JSON.stringify(notification));
+        console.log('Custom properties ' + JSON.stringify(notification.customProperties));
+    });
 
 The received notification object implements the following interface:
 
@@ -132,16 +141,16 @@ Custom properties can be set using the exposed methods of the TwinPush SDK. Thes
 Use the aproppiate method depending of the value type:
 
     twinpush.setIntegerProperty("age", 23, function(value) {
-        alert("Age set to " + value);
+        console.log("Age set to " + value);
     });
     twinpush.setFloatProperty("rating", 6.7, function(value) {
-        alert("Rating set to " + value);
+        console.log("Rating set to " + value);
     });
     twinpush.setBooleanProperty("single", false, function(value) {
-        alert("Single set to " + value);
+        console.log("Single set to " + value);
     });
     twinpush.setStringProperty("fullName", "Bruce Wayne", function(value) {
-        alert("Full Name set to " + value);
+        console.log("Full Name set to " + value);
     });
 
 #### Updating location
@@ -149,10 +158,10 @@ Use the aproppiate method depending of the value type:
 User location can be sent to TwinPush in order to perform geo-located segments. Two methods are provided to send the location either explicitly or automatically:
 
     twinpush.setLocation(40.416616, -3.704415, function(value) {
-        alert("Location explicitly set");
+        console.log("Location explicitly set");
     });
     twinpush.updateLocation(twinpush.LocationPrecision.HIGH, function(value) {
-        alert("Location automatically set");
+        console.log("Location automatically set");
     });
 
 Precision for `updateLocation` method can be one of these values:
