@@ -135,7 +135,7 @@
         @"contentUrl": notification.contentUrl ?: [NSNull null],
         @"tags": notification.tags ?: [NSNull null],
         @"customProperties": notification.customProperties ?: [NSNull null],
-        @"date": [dateFormatter stringFromDate:(notification.date ?: [[NSDate alloc] init])]
+        @"date": [dateFormatter stringFromDate:(notification.date ?: [[NSDate alloc] init])] ?: [NSNull null]
     };
     
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:notificationDict options:0 error:nil];
