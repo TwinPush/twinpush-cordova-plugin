@@ -45,7 +45,7 @@
 		<config-file parent="/manifest/application" target="AndroidManifest.xml">
 			<service
 					android:name="com.twincoders.twinpush.sdk.services.NotificationIntentService"
-					exported="false">
+					android:exported="false">
 				<intent-filter>
 					<action android:name="com.google.firebase.MESSAGING_EVENT" />
 				</intent-filter>
