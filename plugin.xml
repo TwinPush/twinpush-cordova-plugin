@@ -27,9 +27,6 @@
 		<header-file src="src/ios/AppDelegate+TwinPush.h"/>
 		<source-file src="src/ios/AppDelegate+TwinPush.m"/>
 		<podspec>
-			<config>
-				<source url="https://github.com/CocoaPods/Specs.git"/>
-			</config>
 			<pods use-frameworks="true">
 				<pod name="TwinPushSDK" spec="~> 4.0.0" />
 			</pods>
