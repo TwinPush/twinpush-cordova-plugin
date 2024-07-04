@@ -38,6 +38,9 @@ public class TwinPush extends CordovaPlugin {
 
     private PushNotification lastNotification;
 
+    private String alias;
+    private boolean registerEnabled = false;
+
     @Override
     protected void pluginInitialize() {
         super.pluginInitialize();
@@ -47,27 +50,15 @@ public class TwinPush extends CordovaPlugin {
         options.twinPushApiKey = preferences.getString("TwinPush_ApiKey", "");
         options.subdomain = preferences.getString("TwinPush_Subdomain", "app");
 
-        twinpush().setup(options);
-        twinpush().register(null, new TwinPushSDK.OnRegistrationListener() {
-            @Override
-            public void onRegistrationSuccess(String currentAlias) {
-                if (registerCallback != null) {
-                    String deviceId = twinpush().getDeviceId();
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, deviceId);
-                    result.setKeepCallback(true);
-                    registerCallback.sendPluginResult(result);
-                }
-            }
+        boolean manualRegister = preferences.getString("TwinPush_ManualRegister", "").equals("true");
+        this.registerEnabled = !manualRegister;
 
-            @Override
-            public void onRegistrationError(Exception exception) {
-                if (registerCallback != null) {
-                    PluginResult result = new PluginResult(PluginResult.Status.ERROR, exception.getMessage());
-                    result.setKeepCallback(true);
-                    registerCallback.sendPluginResult(result);
-                }
-            }
-        });
+        twinpush().setup(options);
+
+        if (this.registerEnabled) {
+            register(null);
+        }
+
         checkPushNotification(cordova.getActivity().getIntent());
     }
 
@@ -75,110 +66,91 @@ public class TwinPush extends CordovaPlugin {
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
         try {
             Log.v(LOG_TAG, action);
-            if ("setAlias".equals(action)) {
-                String alias = data.getString(0);
-                twinpush().register(alias, new TwinPushSDK.OnRegistrationListener() {
-                    @Override
-                    public void onRegistrationSuccess(String currentAlias) {
-                        callbackContext.success("Successfully registered");
-                        if (registerCallback != null) {
-                            String deviceId = twinpush().getDeviceId();
-                            PluginResult result = new PluginResult(PluginResult.Status.OK, deviceId);
-                            result.setKeepCallback(true);
-                            registerCallback.sendPluginResult(result);
-                        }
+            switch (action) {
+                case "setAlias":
+                    this.alias = data.getString(0);
+                    if (this.registerEnabled) {
+                        register(callbackContext);
                     }
+                    return true;
+                case "setRegisterCallback":
+                    registerCallback = callbackContext;
+                    return true;
+                case "setNotificationOpenCallback":
+                    notificationOpenCallback = callbackContext;
 
-                    @Override
-                    public void onRegistrationError(Exception exception) {
-                        callbackContext.error(exception.getMessage());
-                        if (registerCallback != null) {
-                            PluginResult result = new PluginResult(PluginResult.Status.ERROR, exception.getMessage());
-                            result.setKeepCallback(true);
-                            registerCallback.sendPluginResult(result);
-                        }
+                    // Send saved notification if any
+                    if (lastNotification != null) {
+                        sendNotificationToCallback(lastNotification);
+                        lastNotification = null;
                     }
-                });
-                return true;
-            }
-            else if ("setRegisterCallback".equals(action)) {
-                registerCallback = callbackContext;
-                return true;
-            }
-            else if ("setNotificationOpenCallback".equals(action)) {
-                notificationOpenCallback = callbackContext;
-
-                // Send saved notification if any
-                if (lastNotification != null) {
-                    sendNotificationToCallback(lastNotification);
-                    lastNotification = null;
+                    return true;
+                case "getDeviceId":
+                    callbackContext.success(twinpush().getDeviceId());
+                    return true;
+                case "setIntegerProperty": {
+                    String key = data.getString(0);
+                    int value = data.getInt(1);
+                    twinpush().setProperty(key, value);
+                    callbackContext.success(value);
+                    return true;
                 }
-                return true;
-            }
-            else if ("getDeviceId".equals(action)) {
-                callbackContext.success(twinpush().getDeviceId());
-                return true;
-            }
-            else if ("setIntegerProperty".equals(action)) {
-                String key = data.getString(0);
-                Integer value = data.getInt(1);
-                twinpush().setProperty(key, value);
-                callbackContext.success(value);
-                return true;
-            }
-            else if ("setFloatProperty".equals(action)) {
-                String key = data.getString(0);
-                Double value = data.getDouble(1);
-                twinpush().setProperty(key, value);
-                PluginResult result = new PluginResult(PluginResult.Status.OK, value.floatValue());
-                callbackContext.sendPluginResult(result);
-                return true;
-            }
-            else if ("setBooleanProperty".equals(action)) {
-                String key = data.getString(0);
-                Boolean value = data.getBoolean(1);
-                twinpush().setProperty(key, value);
-                PluginResult result = new PluginResult(PluginResult.Status.OK, value);
-                callbackContext.sendPluginResult(result);
-                return true;
-            }
-            else if ("setStringProperty".equals(action)) {
-                String key = data.getString(0);
-                String value = data.getString(1);
-                twinpush().setProperty(key, value);
-                callbackContext.success(value);
-                return true;
-            }
-            else if ("setLocation".equals(action)) {
-                Double latitude = data.getDouble(0);
-                Double longitude = data.getDouble(1);
-                twinpush().setLocation(latitude, longitude);
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
-                return true;
-            }
-            else if ("updateLocation".equals(action)) {
-                int accuracy = data.getInt(0);
-                LocationPrecision precision;
-                switch (accuracy) {
-                    case FINE:
-                        precision = LocationPrecision.FINE;
-                        break;
-                    case HIGH:
-                        precision = LocationPrecision.HIGH;
-                        break;
-                    case LOW:
-                        precision = LocationPrecision.LOW;
-                        break;
-                    case COARSE:
-                        precision = LocationPrecision.COARSE;
-                        break;
-                    default:
-                        precision = LocationPrecision.MEDIUM;
-                        break;
+                case "setFloatProperty": {
+                    String key = data.getString(0);
+                    Double value = data.getDouble(1);
+                    twinpush().setProperty(key, value);
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, value.floatValue());
+                    callbackContext.sendPluginResult(result);
+                    return true;
                 }
-                twinpush().updateLocation(precision);
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
-                return true;
+                case "setBooleanProperty": {
+                    String key = data.getString(0);
+                    boolean value = data.getBoolean(1);
+                    twinpush().setProperty(key, value);
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, value);
+                    callbackContext.sendPluginResult(result);
+                    return true;
+                }
+                case "setStringProperty": {
+                    String key = data.getString(0);
+                    String value = data.getString(1);
+                    twinpush().setProperty(key, value);
+                    callbackContext.success(value);
+                    return true;
+                }
+                case "setLocation":
+                    double latitude = data.getDouble(0);
+                    double longitude = data.getDouble(1);
+                    twinpush().setLocation(latitude, longitude);
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
+                    return true;
+                case "updateLocation":
+                    int accuracy = data.getInt(0);
+                    LocationPrecision precision;
+                    switch (accuracy) {
+                        case FINE:
+                            precision = LocationPrecision.FINE;
+                            break;
+                        case HIGH:
+                            precision = LocationPrecision.HIGH;
+                            break;
+                        case LOW:
+                            precision = LocationPrecision.LOW;
+                            break;
+                        case COARSE:
+                            precision = LocationPrecision.COARSE;
+                            break;
+                        default:
+                            precision = LocationPrecision.MEDIUM;
+                            break;
+                    }
+                    twinpush().updateLocation(precision);
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
+                    return true;
+                case "registerDevice":
+                    this.registerEnabled = true;
+                    register(callbackContext);
+                    return true;
             }
 
         } catch (JSONException e) {
@@ -259,5 +231,34 @@ public class TwinPush extends CordovaPlugin {
             PluginResult result = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
             notificationOpenCallback.sendPluginResult(result);
         }
+    }
+
+    private void register(CallbackContext callback) {
+        twinpush().register(this.alias, new TwinPushSDK.OnRegistrationListener() {
+            @Override
+            public void onRegistrationSuccess(String currentAlias) {
+                String deviceId = twinpush().getDeviceId();
+                if (registerCallback != null) {
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, deviceId);
+                    result.setKeepCallback(true);
+                    registerCallback.sendPluginResult(result);
+                }
+                if (callback != null) {
+                    callback.success(deviceId);
+                }
+            }
+
+            @Override
+            public void onRegistrationError(Exception exception) {
+                if (registerCallback != null) {
+                    PluginResult result = new PluginResult(PluginResult.Status.ERROR, exception.getMessage());
+                    result.setKeepCallback(true);
+                    registerCallback.sendPluginResult(result);
+                }
+                if (callback != null) {
+                    callback.error(exception.getMessage());
+                }
+            }
+        });
     }
 }

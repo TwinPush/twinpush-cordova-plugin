@@ -5,8 +5,11 @@
 @interface TwinPush()
 @property (nonatomic, retain) CDVInvokedUrlCommand* aliasCommand;
 @property (nonatomic, retain) CDVInvokedUrlCommand* registerCallbackCommand;
+@property (nonatomic, retain) CDVInvokedUrlCommand* manualRegisterCallbackCommand;
 @property (nonatomic, retain) CDVInvokedUrlCommand* notificationOpenCallbackCommand;
 @property (nonatomic, retain) TPNotification* lastReceivedNotification;
+@property (nonatomic, assign) BOOL automaticRegister;
+@property (nonatomic, assign) BOOL registerEnabled;
 @end
 
 @implementation TwinPush
@@ -17,7 +20,10 @@
 
     NSString* appId = settings[@"TwinPush_AppId".lowercaseString];
     NSString* apiKey = settings[@"TwinPush_ApiKey".lowercaseString];
-    NSString* subdomain = settings[@"TwinPush_Subdomain".lowercaseString];
+    NSString* subdomain  = settings[@"TwinPush_Subdomain".lowercaseString];
+    NSString* manualRegister  = settings[@"TwinPush_ManualRegister".lowercaseString];
+    self.automaticRegister = manualRegister == nil || ![manualRegister isEqualToString:@"true"];
+
     if (subdomain != nil) {
         [[TwinPushManager manager] setServerSubdomain:subdomain];
     }
@@ -42,7 +48,7 @@
 
 - (void)setNotificationOpenCallback:(CDVInvokedUrlCommand *)command {
     self.notificationOpenCallbackCommand = command;
-    
+
     if (_lastReceivedNotification != nil) {
         [self sendNotificationOpenToCallback:_lastReceivedNotification];
         _lastReceivedNotification = nil;
@@ -58,7 +64,7 @@
 - (void)setIntegerProperty:(CDVInvokedUrlCommand*)command {
     NSString* key = [command argumentAtIndex:0];
     NSNumber* value = [command argumentAtIndex:1];
-    
+
     [[TwinPushManager manager] setProperty:key withIntegerValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:value.intValue];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -67,7 +73,7 @@
 - (void)setFloatProperty:(CDVInvokedUrlCommand*)command {
     NSString* key = [command argumentAtIndex:0];
     NSNumber* value = [command argumentAtIndex:1];
-    
+
     [[TwinPushManager manager] setProperty:key withFloatValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:value.doubleValue];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -76,7 +82,7 @@
 - (void)setBooleanProperty:(CDVInvokedUrlCommand*)command {
     NSString* key = [command argumentAtIndex:0];
     NSNumber* value = [command argumentAtIndex:1];
-    
+
     [[TwinPushManager manager] setProperty:key withBooleanValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:value.boolValue];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -85,7 +91,7 @@
 - (void)setStringProperty:(CDVInvokedUrlCommand*)command {
     NSString* key = [command argumentAtIndex:0];
     NSString* value = [command argumentAtIndex:1];
-    
+
     [[TwinPushManager manager] setProperty:key withStringValue:value];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -94,7 +100,7 @@
 - (void)setLocation:(CDVInvokedUrlCommand *)command {
     double latitude = [[command argumentAtIndex:0] doubleValue];
     double longitude = [[command argumentAtIndex:1] doubleValue];
-    
+
     [[TwinPushManager manager] setLocationWithLatitude:latitude longitude:longitude];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:YES];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -137,11 +143,17 @@
         @"customProperties": notification.customProperties ?: [NSNull null],
         @"date": [dateFormatter stringFromDate:(notification.date ?: [[NSDate alloc] init])] ?: [NSNull null]
     };
-    
+
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:notificationDict options:0 error:nil];
     NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:jsonString];
     [self.commandDelegate sendPluginResult:result callbackId:_notificationOpenCallbackCommand.callbackId];
+}
+
+- (void)registerDevice:(CDVInvokedUrlCommand *)command {
+    self.registerEnabled = true;
+    self.manualRegisterCallbackCommand = command;
+    [[TwinPushManager manager] registerDevice];
 }
 
 #pragma mark - TwinPushManagerDelegate
@@ -159,6 +171,12 @@
         pluginResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.registerCallbackCommand.callbackId];
     }
+    if (self.manualRegisterCallbackCommand != nil) {
+        NSString* deviceId = [TwinPushManager manager].deviceId;
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.manualRegisterCallbackCommand.callbackId];
+        self.manualRegisterCallbackCommand = nil;
+    }
 }
 
 - (void)didFailRegisteringDevice:(NSString *)error {
@@ -172,6 +190,11 @@
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error];
         pluginResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.registerCallbackCommand.callbackId];
+    }
+    if (self.manualRegisterCallbackCommand != nil) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.manualRegisterCallbackCommand.callbackId];
+        self.manualRegisterCallbackCommand = nil;
     }
 }
 
@@ -187,6 +210,12 @@
         pluginResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.registerCallbackCommand.callbackId];
     }
+    if (self.manualRegisterCallbackCommand != nil) {
+        NSString* deviceId = [TwinPushManager manager].deviceId;
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.manualRegisterCallbackCommand.callbackId];
+        self.manualRegisterCallbackCommand = nil;
+    }
 }
 
 - (void)showNotification:(TPNotification *)notification {
@@ -197,6 +226,10 @@
         // Save notification in case the callback is registered after the notification is received
         self.lastReceivedNotification = notification;
     }
+}
+
+- (BOOL)shouldRegisterDeviceWithAlias:(NSString *)alias token:(NSString *)token {
+    return self.automaticRegister || self.registerEnabled;
 }
 
 @end

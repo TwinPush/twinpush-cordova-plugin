@@ -12,6 +12,7 @@ This is the list of the allowed parameters, all of them must follow the format `
 
 - `SUBDOMAIN` variable is optional and defaults to `app`. It only has to be set if you are using a custom subdomain. It can be later modified as `TwinPush_Subdomain` in the project _config.xml_ file.
 
+- `MANUAL_REGISTER` variable is optional and if set to `true` it disables the automatic device register. It can be later modified as `TwinPush_ManualRegister` in the project _config.xml_ file.
 
 #### FCM configuration for Android
 
@@ -172,4 +173,29 @@ Precision for `updateLocation` method can be one of these values:
 - `COARSE`
 
 Higher precisions may take longer to obtain and will drain more battery.
+
+### Manual registration
+
+TwinPush automatically registers the user device into the platform when the application starts.
+This automatic behavior can be disabled by setting the `TwinPush_ManualRegister` configuration property to `true` in the configuration file `config.xml`:
+
+```
+<preference name="TwinPush_ManualRegister" value="true" />
+```
+
+It can also be configured by setting the `MANUAL_REGISTER` argument to `true` in the plugin installation command.
+
+When manual register is enabled, the devices will no longer register to TwinPush automatically and they must be registered to the platform by manually calling `registerDevice` method:
+
+    twinpush.registerDevice(
+        (msg) => {
+          console.log('Register success');
+        },
+        () => {
+          console.log('Error registering device');
+        }
+    );
+
+
+Note that if manual register is enabled there's no need to call `setRegisterCallback` to obtain the result of the register.
 

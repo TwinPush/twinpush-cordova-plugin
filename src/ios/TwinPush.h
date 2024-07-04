@@ -23,4 +23,6 @@ typedef NSUInteger TPLocationPrecision;
 
 - (void)setLocation:(CDVInvokedUrlCommand*)command;
 - (void)updateLocation:(CDVInvokedUrlCommand*)command;
+
+- (void)registerDevice:(CDVInvokedUrlCommand*)command;
 @end

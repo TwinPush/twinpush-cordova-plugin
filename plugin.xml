@@ -5,6 +5,7 @@
 	<preference name="APP_ID"/>
 	<preference name="API_KEY"/>
 	<preference name="SUBDOMAIN" default="app"/>
+	<preference name="MANUAL_REGISTER" default="false"/>
 
 	<engines>
 		<engine name="cordova" version="&gt;=6.4.0"/>
@@ -69,5 +70,6 @@
 		<preference name="TwinPush_AppId" value="$APP_ID"/>
 		<preference name="TwinPush_ApiKey" value="$API_KEY"/>
 		<preference name="TwinPush_Subdomain" value="$SUBDOMAIN"/>
+		<preference name="TwinPush_ManualRegister" value="$MANUAL_REGISTER"/>
 	</config-file>
 </plugin>

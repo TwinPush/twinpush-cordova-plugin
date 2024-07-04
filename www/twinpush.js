@@ -48,4 +48,8 @@ module.exports = {
 	updateLocation: function(accuracy, successCallback, errorCallback = () => {}) {
 		cordova.exec(successCallback, errorCallback, 'TwinPush', 'updateLocation', [accuracy]);
 	},
+
+	registerDevice: function(successCallback, errorCallback = () => {}) {
+		cordova.exec(successCallback, errorCallback, 'TwinPush', 'registerDevice', []);
+	}
 }
